@@ -12,6 +12,7 @@ const videoSchema = z.object({
   description: z.string().optional(),
   published: z.coerce.boolean().default(true),
   order: z.coerce.number().default(0),
+  categoryId: z.string().optional().transform(val => (val === "" || val === "none" ? null : val)),
 })
 
 export type VideoFormState = {
@@ -38,6 +39,7 @@ export async function createVideo(prevState: VideoFormState, formData: FormData)
     description: formData.get("description"),
     published: formData.get("published") === "true" || formData.get("published") === "on",
     order: formData.get("order"),
+    categoryId: formData.get("categoryId"),
   })
 
   if (!validatedFields.success) {
@@ -76,6 +78,7 @@ export async function updateVideo(
     description: formData.get("description"),
     published: formData.get("published") === "true" || formData.get("published") === "on",
     order: formData.get("order"),
+    categoryId: formData.get("categoryId"),
   })
 
   if (!validatedFields.success) {
@@ -112,3 +115,75 @@ export async function deleteVideo(id: string) {
   revalidatePath("/admin/videolar")
   revalidatePath("/")
 }
+
+// ─── VIDEO CATEGORY ACTIONS ─────────────────────────────────────────────
+
+const categorySchema = z.object({
+  title: z.string().min(1, "Başlık gerekli"),
+  slug: z.string().min(1, "Slug gerekli"),
+  order: z.coerce.number().default(0),
+})
+
+export type VideoCategoryFormState = {
+  errors?: {
+    title?: string[]
+    slug?: string[]
+    order?: string[]
+    _form?: string[]
+  }
+  message?: string | null
+  success?: boolean
+}
+
+export async function createVideoCategory(prevState: VideoCategoryFormState, formData: FormData): Promise<VideoCategoryFormState> {
+  const session = await auth()
+  if (session?.user?.role !== "ADMIN") {
+    return { errors: { _form: ["Yetkisiz işlem"] } }
+  }
+
+  const validatedFields = categorySchema.safeParse({
+    title: formData.get("title"),
+    slug: formData.get("slug"),
+    order: formData.get("order"),
+  })
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Lütfen eksik alanları doldurun.",
+    }
+  }
+
+  try {
+    await prisma.videoCategory.create({
+      data: validatedFields.data,
+    })
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      return { errors: { slug: ["Bu slug zaten kullanılıyor."] } }
+    }
+    return { errors: { _form: ["Kayıt sırasında bir hata oluştu."] } }
+  }
+
+  revalidatePath("/admin/videolar/kategoriler")
+  revalidatePath("/youtube")
+  return { success: true, message: "Kategori oluşturuldu." }
+}
+
+export async function deleteVideoCategory(id: string) {
+  const session = await auth()
+  if (session?.user?.role !== "ADMIN") {
+    throw new Error("Yetkisiz işlem")
+  }
+  
+  await prisma.video.updateMany({
+    where: { categoryId: id },
+    data: { categoryId: null }
+  })
+
+  await prisma.videoCategory.delete({ where: { id } })
+  
+  revalidatePath("/admin/videolar/kategoriler")
+  revalidatePath("/youtube")
+}
+

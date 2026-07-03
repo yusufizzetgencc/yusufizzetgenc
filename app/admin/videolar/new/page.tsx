@@ -1,8 +1,13 @@
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { VideoForm } from "../components/video-form"
+import { prisma } from "@/lib/prisma"
 
-export default function NewVideoPage() {
+export default async function NewVideoPage() {
+  const categories = await prisma.videoCategory.findMany({
+    orderBy: { order: "asc" },
+  })
+
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center gap-4">
@@ -21,7 +26,7 @@ export default function NewVideoPage() {
       </div>
 
       <div className="rounded-md border border-border bg-card p-6">
-        <VideoForm />
+        <VideoForm categories={categories} />
       </div>
     </div>
   )

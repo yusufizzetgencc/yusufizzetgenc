@@ -50,6 +50,20 @@ export function RegisterForm() {
             </div>
           </div>
           <div className="space-y-2">
+            <Label htmlFor="username">Kullanıcı Adı</Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm">@</span>
+              <Input
+                id="username"
+                name="username"
+                placeholder="yusufizzet"
+                className="pl-9"
+                required
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="email">E-posta</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

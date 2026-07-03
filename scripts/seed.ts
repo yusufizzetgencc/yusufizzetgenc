@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs"
 import { prisma } from "../lib/prisma"
 
 async function main() {
-  const email = process.env.ADMIN_EMAIL || "admin@example.com"
-  const password = process.env.ADMIN_PASSWORD || "password123"
+  const email = process.env.ADMIN_EMAIL || "admin"
+  const password = process.env.ADMIN_PASSWORD || "Admin12345"
 
   let admin = await prisma.user.findUnique({
     where: { email },
@@ -14,6 +14,7 @@ async function main() {
     admin = await prisma.user.create({
       data: {
         name: "Yusuf İzzet Genç",
+        username: "admin",
         email,
         passwordHash,
         role: "ADMIN",
@@ -23,7 +24,16 @@ async function main() {
     console.log(`Email: ${admin.email}`)
     console.log(`Şifre: ${password}`)
   } else {
-    console.log(`Admin kullanıcısı (${email}) zaten mevcut.`)
+    // Update existing admin to have a username
+    if (!admin.username) {
+      admin = await prisma.user.update({
+        where: { email },
+        data: { username: "admin" }
+      })
+      console.log(`Mevcut admin kullanıcısına username (admin) eklendi.`)
+    } else {
+      console.log(`Admin kullanıcısı (${email}) zaten mevcut ve kullanıcı adı var.`)
+    }
   }
 
   // --- SEED KATEGORİ VE ROADMAP ---

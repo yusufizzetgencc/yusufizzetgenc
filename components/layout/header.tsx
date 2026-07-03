@@ -12,9 +12,10 @@ const navItems = [
   { href: "/blog", label: "Blog" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/projeler", label: "Projeler" },
+  { href: "/youtube", label: "YouTube" },
 ]
 
-export function Header() {
+export function Header({ user }: { user?: any }) {
   const pathname = usePathname()
 
   // Admin sayfalarında header gösterme (admin kendi layoutunu kullanır)
@@ -72,22 +73,30 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-1.5">
           <div className="hidden items-center gap-1.5 md:flex">
-            <Link
-              href="/giris"
-              className={buttonVariants({ variant: "ghost", size: "sm" })}
-            >
-              Giriş
-            </Link>
-            <Link
-              href="/kayit"
-              className={buttonVariants({ variant: "default", size: "sm" })}
-            >
-              Kayıt Ol
-            </Link>
+            {user ? (
+              <span className="text-sm font-medium text-foreground px-3">
+                Merhaba, {user.name || "Kullanıcı"}
+              </span>
+            ) : (
+              <>
+                <Link
+                  href="/giris"
+                  className={buttonVariants({ variant: "ghost", size: "sm" })}
+                >
+                  Giriş
+                </Link>
+                <Link
+                  href="/kayit"
+                  className={buttonVariants({ variant: "default", size: "sm" })}
+                >
+                  Kayıt Ol
+                </Link>
+              </>
+            )}
           </div>
           <div className="mx-1 hidden h-5 w-px bg-border/60 md:block" />
           <ThemeToggle />
-          <MobileNav />
+          <MobileNav user={user} />
         </div>
       </div>
     </header>

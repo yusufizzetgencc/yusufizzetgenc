@@ -6,6 +6,7 @@ import { z } from "zod"
 
 const registerSchema = z.object({
   name: z.string().min(2, "İsim en az 2 karakter olmalıdır"),
+  username: z.string().min(3, "Kullanıcı adı en az 3 karakter olmalıdır").regex(/^[a-zA-Z0-9_]+$/, "Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir"),
   email: z.string().email("Geçerli bir e-posta adresi giriniz"),
   password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
 })
@@ -14,6 +15,7 @@ export async function registerUser(formData: FormData) {
   // formData'dan gelen değerleri güvenli bir şekilde string'e çeviriyoruz
   const validatedFields = registerSchema.safeParse({
     name: formData.get("name")?.toString() || "",
+    username: formData.get("username")?.toString() || "",
     email: formData.get("email")?.toString() || "",
     password: formData.get("password")?.toString() || "",
   })
@@ -26,17 +28,29 @@ export async function registerUser(formData: FormData) {
     }
   }
 
-  const { name, email, password } = validatedFields.data
+  const { name, username, email, password } = validatedFields.data
 
   try {
     // 2. E-posta kullanımda mı kontrolü
-    const existingUser = await prisma.user.findUnique({
+    const existingEmail = await prisma.user.findUnique({
       where: { email }
     })
 
-    if (existingUser) {
+    if (existingEmail) {
       return {
         error: "Bu e-posta adresi zaten kullanımda.",
+        success: false
+      }
+    }
+
+    // 2.5. Kullanıcı adı kullanımda mı kontrolü
+    const existingUsername = await prisma.user.findUnique({
+      where: { username }
+    })
+
+    if (existingUsername) {
+      return {
+        error: "Bu kullanıcı adı zaten alınmış.",
         success: false
       }
     }
@@ -48,6 +62,7 @@ export async function registerUser(formData: FormData) {
     await prisma.user.create({
       data: {
         name,
+        username,
         email,
         passwordHash,
       }

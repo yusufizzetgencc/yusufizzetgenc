@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Home, BookOpen, Map, Folder, LogIn, UserPlus } from "lucide-react"
+import { Menu, X, Home, BookOpen, Map, Folder, LogIn, UserPlus, PlayCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -12,9 +12,10 @@ const navItems = [
   { href: "/blog", label: "Blog", icon: BookOpen },
   { href: "/roadmap", label: "Roadmap", icon: Map },
   { href: "/projeler", label: "Projeler", icon: Folder },
+  { href: "/youtube", label: "YouTube", icon: PlayCircle },
 ]
 
-export function MobileNav() {
+export function MobileNav({ user }: { user?: any }) {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
@@ -110,20 +111,28 @@ export function MobileNav() {
 
           {/* Alt Kısım: Auth Butonları */}
           <div className="border-t border-border/40 p-4 space-y-2">
-            <Link
-              href="/giris"
-              className="flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              <LogIn className="size-4" />
-              Giriş Yap
-            </Link>
-            <Link
-              href="/kayit"
-              className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              <UserPlus className="size-4" />
-              Kayıt Ol
-            </Link>
+            {user ? (
+              <div className="flex items-center justify-center gap-2 rounded-lg bg-muted px-4 py-2.5 text-sm font-medium text-foreground">
+                Merhaba, {user.name || "Kullanıcı"}
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/giris"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
+                >
+                  <LogIn className="size-4" />
+                  Giriş Yap
+                </Link>
+                <Link
+                  href="/kayit"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  <UserPlus className="size-4" />
+                  Kayıt Ol
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>

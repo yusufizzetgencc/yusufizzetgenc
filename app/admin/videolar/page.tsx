@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
 import { Button } from "@/components/ui/button"
-import { Plus, Pencil, Trash2, ExternalLink, MonitorPlay } from "lucide-react"
+import { Plus, Pencil, Trash2, ExternalLink, MonitorPlay, Folder } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -33,12 +33,20 @@ export default async function AdminVideosPage() {
             </p>
           </div>
         </div>
-        <Link href="/admin/videolar/new">
-          <Button className="gap-2">
-            <Plus className="size-4" />
-            Video Ekle
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/videolar/kategoriler">
+            <Button variant="outline" className="gap-2">
+              <Folder className="size-4" />
+              Kategoriler
+            </Button>
+          </Link>
+          <Link href="/admin/videolar/new">
+            <Button className="gap-2">
+              <Plus className="size-4" />
+              Video Ekle
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Tablo */}

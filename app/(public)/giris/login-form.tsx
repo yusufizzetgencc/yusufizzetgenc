@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Geçerli bir e-posta adresi giriniz" }),
+  identifier: z.string().min(1, { message: "Kullanıcı adı veya e-posta gerekli" }),
   password: z.string().min(6, { message: "Şifre en az 6 karakter olmalıdır" }),
 })
 
@@ -39,13 +39,13 @@ export function LoginForm() {
 
     try {
       const result = await signIn("credentials", {
-        email: data.email,
+        identifier: data.identifier,
         password: data.password,
         redirect: false,
       })
 
       if (result?.error) {
-        setError("E-posta veya şifre hatalı.")
+        setError("Kullanıcı adı/E-posta veya şifre hatalı.")
       } else {
         router.push("/admin")
         router.refresh()
@@ -62,20 +62,20 @@ export function LoginForm() {
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">E-posta</Label>
+            <Label htmlFor="identifier">Kullanıcı Adı veya E-posta</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                id="email"
-                type="email"
-                placeholder="isim@ornek.com"
+                id="identifier"
+                type="text"
+                placeholder="kullanici_adi veya isim@ornek.com"
                 className="pl-9"
-                {...register("email")}
+                {...register("identifier")}
                 disabled={isLoading}
               />
             </div>
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email.message}</p>
+            {errors.identifier && (
+              <p className="text-xs text-destructive">{errors.identifier.message}</p>
             )}
           </div>
           <div className="space-y-2">

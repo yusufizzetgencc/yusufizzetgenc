@@ -15,10 +15,12 @@ interface VideoFormProps {
     description: string | null
     published: boolean
     order: number
+    categoryId: string | null
   } | null
+  categories: { id: string; title: string }[]
 }
 
-export function VideoForm({ video }: VideoFormProps) {
+export function VideoForm({ video, categories }: VideoFormProps) {
   const action = video
     ? updateVideo.bind(null, video.id)
     : createVideo
@@ -72,6 +74,21 @@ export function VideoForm({ video }: VideoFormProps) {
           placeholder="Video hakkında kısa bir açıklama..."
           rows={3}
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="categoryId">Kategori / Oynatma Listesi (Opsiyonel)</Label>
+        <select
+          id="categoryId"
+          name="categoryId"
+          defaultValue={video?.categoryId || "none"}
+          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <option value="none" className="bg-background text-foreground">Kategori Yok</option>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.id} className="bg-background text-foreground">{cat.title}</option>
+          ))}
+        </select>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

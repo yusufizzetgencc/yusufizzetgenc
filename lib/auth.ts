@@ -11,22 +11,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        email: { label: "E-posta", type: "email" },
+        identifier: { label: "Kullanıcı Adı veya E-posta", type: "text" },
         password: { label: "Şifre", type: "password" },
       },
       authorize: async (credentials) => {
         const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
+          .object({ identifier: z.string().min(1), password: z.string().min(6) })
           .safeParse(credentials)
 
         if (!parsedCredentials.success) {
           return null
         }
 
-        const { email, password } = parsedCredentials.data
+        const { identifier, password } = parsedCredentials.data
 
-        const user = await prisma.user.findUnique({
-          where: { email },
+        const isEmail = identifier.includes("@")
+
+        const user = await prisma.user.findFirst({
+          where: isEmail ? { email: identifier } : { username: identifier },
         })
 
         if (!user || !user.passwordHash) return null

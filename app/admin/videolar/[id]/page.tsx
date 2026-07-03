@@ -13,6 +13,10 @@ export default async function EditVideoPage({
   const video = await prisma.video.findUnique({
     where: { id },
   })
+  
+  const categories = await prisma.videoCategory.findMany({
+    orderBy: { order: "asc" },
+  })
 
   if (!video) {
     notFound()
@@ -36,7 +40,7 @@ export default async function EditVideoPage({
       </div>
 
       <div className="rounded-md border border-border bg-card p-6">
-        <VideoForm video={video} />
+        <VideoForm video={video} categories={categories} />
       </div>
     </div>
   )
