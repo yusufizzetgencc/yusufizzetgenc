@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Home, BookOpen, Map, Folder, LogIn, UserPlus, PlayCircle } from "lucide-react"
+import { Menu, X, Home, BookOpen, Map, Folder, LogIn, UserPlus, PlayCircle, LogOut, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { signOut } from "next-auth/react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -112,8 +113,27 @@ export function MobileNav({ user }: { user?: any }) {
           {/* Alt Kısım: Auth Butonları */}
           <div className="border-t border-border/40 p-4 space-y-2">
             {user ? (
-              <div className="flex items-center justify-center gap-2 rounded-lg bg-muted px-4 py-2.5 text-sm font-medium text-foreground">
-                Merhaba, {user.name || "Kullanıcı"}
+              <div className="space-y-2">
+                <div className="flex items-center justify-center gap-2 rounded-lg bg-muted px-4 py-2.5 text-sm font-medium text-foreground">
+                  Merhaba, {user.name || "Kullanıcı"}
+                </div>
+                {user.role === "ADMIN" && (
+                  <Link
+                    href="/admin"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    <LayoutDashboard className="size-4" />
+                    Admin Paneli
+                  </Link>
+                )}
+                <Button
+                  variant="ghost"
+                  className="w-full gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                >
+                  <LogOut className="size-4" />
+                  Çıkış Yap
+                </Button>
               </div>
             ) : (
               <>

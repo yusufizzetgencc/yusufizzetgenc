@@ -5,7 +5,17 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
 import { MobileNav } from "@/components/layout/mobile-nav"
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { signOut } from "next-auth/react"
+import { LogOut, LayoutDashboard, User } from "lucide-react"
 
 const navItems = [
   { href: "/", label: "Anasayfa" },
@@ -74,9 +84,33 @@ export function Header({ user }: { user?: any }) {
         <div className="flex items-center gap-1.5">
           <div className="hidden items-center gap-1.5 md:flex">
             {user ? (
-              <span className="text-sm font-medium text-foreground px-3">
-                Merhaba, {user.name || "Kullanıcı"}
-              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger render={
+                  <Button variant="ghost" className="gap-2 px-2">
+                    <User className="size-4" />
+                    <span className="text-sm font-medium">
+                      {user.name || "Kullanıcı"}
+                    </span>
+                  </Button>
+                } />
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>Hesabım</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {user.role === "ADMIN" && (
+                    <DropdownMenuItem render={<Link href="/admin" />} className="flex w-full cursor-pointer items-center">
+                      <LayoutDashboard className="mr-2 size-4" />
+                      <span>Admin Paneli</span>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem 
+                    className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                  >
+                    <LogOut className="mr-2 size-4" />
+                    <span>Çıkış Yap</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
                 <Link
