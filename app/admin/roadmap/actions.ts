@@ -69,6 +69,22 @@ export async function deleteCategory(id: string) {
   if (session?.user?.role !== "ADMIN") {
     throw new Error("Yetkisiz işlem")
   }
+
+  // İlk olarak bağlı roadmap'leri bul
+  const roadmaps = await prisma.roadmap.findMany({ where: { categoryId: id } })
+  const roadmapIds = roadmaps.map((r) => r.id)
+
+  // Eğer roadmap varsa, onlara bağlı topic'leri sil
+  if (roadmapIds.length > 0) {
+    await prisma.topic.deleteMany({
+      where: { roadmapId: { in: roadmapIds } }
+    })
+  }
+
+  // Ardından roadmap'leri sil
+  await prisma.roadmap.deleteMany({ where: { categoryId: id } })
+
+  // En son kategoriyi sil
   await prisma.category.delete({ where: { id } })
   revalidatePath("/admin/roadmap")
 }
@@ -138,6 +154,11 @@ export async function deleteRoadmap(id: string) {
   if (session?.user?.role !== "ADMIN") {
     throw new Error("Yetkisiz işlem")
   }
+  
+  // Önce bu roadmap'e bağlı tüm topic'leri sil
+  await prisma.topic.deleteMany({ where: { roadmapId: id } })
+
+  // Sonra roadmap'i sil
   await prisma.roadmap.delete({ where: { id } })
   revalidatePath("/admin/roadmap")
 }

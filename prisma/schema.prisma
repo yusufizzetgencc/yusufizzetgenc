@@ -96,12 +96,24 @@ model Project {
 
 // ─── VİDEOLAR ────────────────────────────────────
 
-model Video {
+model VideoCategory {
   id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  order       Int      @default(0)
+  videos      Video[]
+  createdAt   DateTime @default(now())
+}
+
+model Video {
+  id          String         @id @default(cuid())
   title       String
   youtubeUrl  String
   description String?
-  published   Boolean  @default(true)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
+  published   Boolean        @default(true)
+  order       Int            @default(0)
+  categoryId  String?
+  category    VideoCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt   DateTime       @default(now())
 }
+

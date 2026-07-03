@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma"
 // YouTube URL'sinden embed linkini çıkaran yardımcı fonksiyon
 function getYouTubeEmbedUrl(url: string) {
   if (!url) return null
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
   const match = url.match(regExp)
   
   if (match && match[2].length === 11) {
@@ -43,8 +43,8 @@ export default async function HomePage() {
     }),
     prisma.video.findMany({
       where: { published: true },
-      orderBy: { order: "asc" }, // İstenirse createdAt: "desc" de yapılabilir
-      take: 2, // Ana sayfada çok yer kaplamaması için son 2 veya 3 video
+      orderBy: { order: "asc" },
+      take: 2,
     })
   ])
 
@@ -52,25 +52,29 @@ export default async function HomePage() {
     <>
       {/* ───── HERO ───── */}
       <section className="relative overflow-hidden">
+        {/* Dot pattern arka plan */}
+        <div className="subtle-grid pointer-events-none absolute inset-0 -z-10" />
+        {/* Gradient glow */}
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-primary/[0.04] blur-[100px]" />
         </div>
 
-        <div className="mx-auto max-w-5xl px-4 py-24 sm:px-6 sm:py-32 lg:py-40">
+        <div className="mx-auto max-w-5xl px-4 py-28 sm:px-6 sm:py-36 lg:py-44">
           <div className="max-w-2xl">
-            <Badge variant="secondary" className="mb-6 font-normal">
+            <Badge variant="secondary" className="animate-in mb-8 gap-1.5 px-3 py-1 font-normal">
+              <span className="inline-block size-1.5 animate-pulse rounded-full bg-primary" />
               Yazılım & Teknoloji
             </Badge>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="animate-in-delay-1 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Merhaba, ben{" "}
               <span className="text-primary">Yusuf İzzet</span>
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground sm:text-xl">
+            <p className="animate-in-delay-2 mt-6 text-lg leading-relaxed text-muted-foreground sm:text-xl">
               Yazılım geliştirici, içerik üreticisi ve sürekli öğrenen biri.
               Bu platformda yazılım yolculuğumu, öğrendiklerimi ve projelerimi
               paylaşıyorum. Birlikte öğrenelim.
             </p>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
+            <div className="animate-in-delay-3 mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href="/roadmap" className={buttonVariants({ size: "lg" })}>
                 Roadmap&apos;i Keşfet
                 <ArrowRight className="ml-1.5 size-4" data-icon="inline-end" />
@@ -83,17 +87,19 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ───── YOUTUBE VİDEOLARI (YENİ ALAN) ───── */}
+      {/* ───── YOUTUBE VİDEOLARI ───── */}
       {latestVideos.length > 0 && (
         <section className="border-t border-border/40">
           <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-24">
             <div className="mb-12 flex items-end justify-between">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl flex items-center gap-2">
-                  <PlayCircle className="text-red-500 size-8" />
+                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl flex items-center gap-2.5">
+                  <div className="flex size-9 items-center justify-center rounded-lg bg-red-500/10">
+                    <PlayCircle className="text-red-500 size-5" />
+                  </div>
                   YouTube Videolarım
                 </h2>
-                <p className="mt-2 text-muted-foreground">
+                <p className="mt-3 text-muted-foreground">
                   Yazılım, kariyer ve teknoloji üzerine son videolarım
                 </p>
               </div>
@@ -103,9 +109,9 @@ export default async function HomePage() {
               {latestVideos.map((video) => {
                 const embedUrl = getYouTubeEmbedUrl(video.youtubeUrl)
                 return (
-                  <div key={video.id} className="flex flex-col gap-3">
+                  <div key={video.id} className="group flex flex-col gap-3">
                     {embedUrl ? (
-                      <div className="overflow-hidden rounded-2xl border border-border shadow-sm aspect-video">
+                      <div className="overflow-hidden rounded-xl border border-border shadow-sm aspect-video transition-shadow group-hover:shadow-md">
                         <iframe
                           src={embedUrl}
                           title={video.title}
@@ -115,11 +121,13 @@ export default async function HomePage() {
                         />
                       </div>
                     ) : (
-                      <div className="flex aspect-video items-center justify-center rounded-2xl bg-muted border border-border">
+                      <div className="flex aspect-video items-center justify-center rounded-xl bg-muted border border-border">
                         Geçersiz Video Linki
                       </div>
                     )}
-                    <h3 className="font-semibold text-lg line-clamp-2">{video.title}</h3>
+                    <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-colors">
+                      {video.title}
+                    </h3>
                     {video.description && (
                       <p className="text-sm text-muted-foreground line-clamp-2">{video.description}</p>
                     )}
@@ -139,13 +147,13 @@ export default async function HomePage() {
               <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
                 Son Yazılar
               </h2>
-              <p className="mt-2 text-muted-foreground">
+              <p className="mt-3 text-muted-foreground">
                 En son yayınlanan blog yazılarım
               </p>
             </div>
             <Link
               href="/blog"
-              className="hidden items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:flex"
+              className="hidden items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80 sm:flex"
             >
               Tümünü Gör
               <ArrowRight className="size-3.5" />
@@ -153,19 +161,25 @@ export default async function HomePage() {
           </div>
 
           {latestPosts.length === 0 ? (
-            <div className="text-center text-muted-foreground py-10">
-              Henüz blog yazısı yayınlanmamış.
+            <div className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-border p-8 text-center">
+              <p className="text-muted-foreground">Henüz blog yazısı yayınlanmamış.</p>
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {latestPosts.map((post) => (
                 <Link key={post.id} href={`/blog/${post.slug}`} className="group">
-                  <Card className="h-full transition-colors hover:border-primary/20 hover:bg-card/80">
+                  <Card className="lift h-full transition-colors hover:border-primary/20">
+                    {/* Dekoratif üst şerit */}
+                    <div className="h-1 w-full bg-gradient-to-r from-primary/20 via-primary/5 to-transparent rounded-t-xl" />
                     <CardHeader>
                       <p className="text-xs font-medium text-muted-foreground">
-                        {new Date(post.createdAt).toLocaleDateString("tr-TR")}
+                        {new Date(post.createdAt).toLocaleDateString("tr-TR", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
                       </p>
-                      <CardTitle className="mt-1.5 text-lg leading-snug group-hover:text-primary transition-colors">
+                      <CardTitle className="mt-2 text-lg leading-snug group-hover:text-primary transition-colors">
                         {post.title}
                       </CardTitle>
                     </CardHeader>
@@ -175,8 +189,9 @@ export default async function HomePage() {
                       </p>
                     </CardContent>
                     <CardFooter>
-                      <span className="text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                        Devamını Oku →
+                      <span className="flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                        Devamını Oku
+                        <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                       </span>
                     </CardFooter>
                   </Card>
@@ -196,21 +211,22 @@ export default async function HomePage() {
       </section>
 
       {/* ───── YOL HARİTALARI ───── */}
-      <section>
+      <section className="border-t border-border/40">
         <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-24">
           <div className="mb-12 text-center">
             <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
               Yol Haritaları
             </h2>
-            <p className="mx-auto mt-2 max-w-lg text-muted-foreground">
+            <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
               Adım adım ilerleyebileceğin, konu anlatımlı ve videolu
               interaktif yol haritaları
             </p>
           </div>
 
           {categories.length === 0 ? (
-            <div className="text-center text-muted-foreground py-10">
-              Henüz yol haritası kategorisi eklenmemiş.
+            <div className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-border p-8 text-center">
+              <Map className="mb-3 size-8 text-muted-foreground/40" />
+              <p className="text-muted-foreground">Henüz yol haritası kategorisi eklenmemiş.</p>
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -221,9 +237,9 @@ export default async function HomePage() {
                     href={`/roadmap/${category.slug}`}
                     className="group"
                   >
-                    <Card className="h-full text-center transition-all hover:border-primary/20 hover:shadow-md hover:-translate-y-0.5">
+                    <Card className="lift h-full text-center transition-all hover:border-primary/20">
                       <CardContent className="pt-8 pb-6">
-                        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/20">
                           <CategoryIcon iconName={category.icon} />
                         </div>
                         <h3 className="font-semibold">{category.title}</h3>

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { User, Mail, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -36,38 +37,51 @@ export function RegisterForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Ad Soyad</Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder="Yusuf İzzet"
-              required
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="name"
+                name="name"
+                placeholder="Yusuf İzzet"
+                className="pl-9"
+                required
+                disabled={isLoading}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">E-posta</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="isim@ornek.com"
-              required
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="isim@ornek.com"
+                className="pl-9"
+                required
+                disabled={isLoading}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Şifre</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              required
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••"
+                className="pl-9"
+                required
+                disabled={isLoading}
+              />
+            </div>
           </div>
 
           {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
               {error}
             </div>
           )}

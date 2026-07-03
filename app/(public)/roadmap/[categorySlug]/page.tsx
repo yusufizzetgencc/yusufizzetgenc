@@ -29,16 +29,18 @@ export default async function CategoryPage({
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
+    <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 page-enter">
+      {/* Geri Butonu */}
       <Link 
         href="/roadmap"
-        className="mb-8 inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="mr-2 size-4" />
+        <ArrowLeft className="size-4" />
         Tüm Kategoriler
       </Link>
       
-      <div className="mb-16 max-w-2xl space-y-4">
+      {/* Sayfa Başlığı */}
+      <div className="mb-14 max-w-2xl space-y-4">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
           {category.title}
         </h1>
@@ -49,8 +51,9 @@ export default async function CategoryPage({
         )}
       </div>
 
+      {/* Roadmap Listesi */}
       {category.roadmaps.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
+        <div className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
           Bu kategoriye ait henüz bir yol haritası eklenmemiş.
         </div>
       ) : (
@@ -59,10 +62,10 @@ export default async function CategoryPage({
             <Link
               key={roadmap.id}
               href={`/roadmap/${category.slug}/${roadmap.slug}`}
-              className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all hover:border-indigo/50 hover:shadow-[0_4px_20px_-4px_rgba(99,102,241,0.1)]"
+              className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all hover:border-indigo/40 hover:shadow-[0_4px_24px_-6px_rgba(99,102,241,0.12)]"
             >
               <div>
-                <h3 className="text-xl font-semibold tracking-tight">{roadmap.title}</h3>
+                <h3 className="text-xl font-semibold tracking-tight group-hover:text-primary transition-colors">{roadmap.title}</h3>
                 {roadmap.description && (
                   <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
                     {roadmap.description}
@@ -70,10 +73,11 @@ export default async function CategoryPage({
                 )}
               </div>
               <div className="mt-6 flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground">
+                <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <span className="inline-block size-1.5 rounded-full bg-primary/40" />
                   {roadmap.topics.length} Konu
                 </span>
-                <span className="flex items-center text-sm font-medium text-indigo opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="flex items-center text-sm font-medium text-indigo opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1">
                   İncele <ChevronRight className="ml-1 size-4" />
                 </span>
               </div>

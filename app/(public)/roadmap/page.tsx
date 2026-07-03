@@ -42,8 +42,8 @@ export default async function RoadmapPage() {
   })
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-16 md:py-24">
-      {/* Sayfa Başlığı (Hero Alanı) */}
+    <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 page-enter">
+      {/* Sayfa Başlığı */}
       <div className="mb-16 max-w-2xl space-y-4">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
           Yol Haritaları
@@ -56,8 +56,8 @@ export default async function RoadmapPage() {
 
       {/* Kategoriler Grid */}
       {categories.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-12 text-center">
-          <Map className="mx-auto mb-4 size-10 text-muted-foreground/50" />
+        <div className="flex min-h-[250px] flex-col items-center justify-center rounded-xl border border-dashed border-border p-12 text-center">
+          <Map className="mx-auto mb-4 size-10 text-muted-foreground/30" />
           <h3 className="text-lg font-medium">Henüz içerik yok</h3>
           <p className="mt-2 text-sm text-muted-foreground">
             Yol haritaları çok yakında eklenecektir.
@@ -69,10 +69,10 @@ export default async function RoadmapPage() {
             <Link 
               key={category.id} 
               href={`/roadmap/${category.slug}`}
-              className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all hover:border-indigo/50 hover:shadow-[0_4px_20px_-4px_rgba(99,102,241,0.1)]"
+              className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all hover:border-indigo/40 hover:shadow-[0_4px_24px_-6px_rgba(99,102,241,0.12)]"
             >
               <div>
-                <div className="mb-4 inline-flex items-center justify-center rounded-xl bg-indigo/10 p-3">
+                <div className="mb-4 inline-flex items-center justify-center rounded-xl bg-indigo/8 p-3 transition-colors group-hover:bg-indigo/15">
                   <CategoryIcon iconName={category.icon} />
                 </div>
                 <h2 className="text-xl font-semibold tracking-tight">
@@ -95,7 +95,7 @@ export default async function RoadmapPage() {
                       key={roadmap.id}
                       className="flex items-center text-sm text-foreground/80"
                     >
-                      <div className="mr-2 size-1.5 rounded-full bg-border" />
+                      <div className="mr-2.5 size-1.5 rounded-full bg-indigo/40" />
                       {roadmap.title}
                     </li>
                   ))}
@@ -111,7 +111,7 @@ export default async function RoadmapPage() {
                   )}
                 </ul>
 
-                <div className="mt-6 flex items-center text-sm font-medium text-indigo opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="mt-6 flex items-center text-sm font-medium text-indigo opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1">
                   Kategoriyi İncele <ChevronRight className="ml-1 size-4" />
                 </div>
               </div>
