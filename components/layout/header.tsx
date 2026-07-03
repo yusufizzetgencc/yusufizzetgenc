@@ -9,6 +9,7 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -94,21 +95,23 @@ export function Header({ user }: { user?: any }) {
                   </Button>
                 } />
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>Hesabım</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {user.role === "ADMIN" && (
-                    <DropdownMenuItem render={<Link href="/admin" />} className="flex w-full cursor-pointer items-center">
-                      <LayoutDashboard className="mr-2 size-4" />
-                      <span>Admin Paneli</span>
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Hesabım</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {user.role === "ADMIN" && (
+                      <DropdownMenuItem render={<Link href="/admin" />} className="flex w-full cursor-pointer items-center">
+                        <LayoutDashboard className="mr-2 size-4" />
+                        <span>Admin Paneli</span>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem 
+                      className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                    >
+                      <LogOut className="mr-2 size-4" />
+                      <span>Çıkış Yap</span>
                     </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem 
-                    className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                  >
-                    <LogOut className="mr-2 size-4" />
-                    <span>Çıkış Yap</span>
-                  </DropdownMenuItem>
+                  </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
