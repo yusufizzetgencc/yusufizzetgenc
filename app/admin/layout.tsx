@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { auth, signOut } from "@/lib/auth"
-import { LayoutDashboard, FileText, Map, Folder, LogOut } from "lucide-react"
+import { LayoutDashboard, FileText, Map, Folder, LogOut, MonitorPlay, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const sidebarLinks = [
@@ -8,6 +8,8 @@ const sidebarLinks = [
   { href: "/admin/blog", label: "Blog Yazıları", icon: FileText },
   { href: "/admin/roadmap", label: "Yol Haritaları", icon: Map },
   { href: "/admin/projeler", label: "Projeler", icon: Folder },
+  { href: "/admin/videolar", label: "Videolar", icon: MonitorPlay },
+  { href: "/admin/uyeler", label: "Üyeler", icon: Users },
 ]
 
 export default async function AdminLayout({

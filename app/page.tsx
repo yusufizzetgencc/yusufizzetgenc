@@ -1,86 +1,57 @@
 import Link from "next/link"
-import { ArrowRight, Code, Server, Cloud, Smartphone } from "lucide-react"
+import { ArrowRight, Code, Server, Cloud, Smartphone, Map, PlayCircle } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { prisma } from "@/lib/prisma"
 
-/* ================================================================
-   PLACEHOLDER VERİ — Database bağlantısı olmadan statik
-   İleride bu veriler Prisma sorguları ile gelecek
-   ================================================================ */
+// YouTube URL'sinden embed linkini çıkaran yardımcı fonksiyon
+function getYouTubeEmbedUrl(url: string) {
+  if (!url) return null
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+  const match = url.match(regExp)
+  
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`
+  }
+  return null
+}
 
-const latestPosts = [
-  {
-    id: "1",
-    title: "Modern Frontend Geliştirmede State Yönetimi",
-    excerpt:
-      "React uygulamalarında state yönetiminin evrimi, Context API'den Zustand'a kadar farklı yaklaşımları ve ne zaman hangisini tercih etmeniz gerektiğini inceliyoruz.",
-    slug: "modern-frontend-state-yonetimi",
-    publishedAt: "28 Haziran 2026",
-  },
-  {
-    id: "2",
-    title: "PostgreSQL Performans İpuçları: Sorgu Optimizasyonu",
-    excerpt:
-      "Yavaş çalışan veritabanı sorgularınızı hızlandırmak için index stratejileri, EXPLAIN ANALYZE kullanımı ve yaygın performans tuzaklarından kaçınma yöntemleri.",
-    slug: "postgresql-performans-ipuclari",
-    publishedAt: "22 Haziran 2026",
-  },
-  {
-    id: "3",
-    title: "Next.js 15 ile Full-Stack Uygulama Geliştirme",
-    excerpt:
-      "Server Components, Server Actions ve App Router kullanarak sıfırdan production-ready bir uygulama nasıl oluşturulur? Adım adım rehber.",
-    slug: "nextjs-15-fullstack-rehber",
-    publishedAt: "15 Haziran 2026",
-  },
-]
+const CategoryIcon = ({ iconName }: { iconName: string | null }) => {
+  const icons: Record<string, React.ElementType> = {
+    Code, Server, Cloud, Smartphone, Map
+  }
+  const Icon = iconName && icons[iconName] ? icons[iconName] : Map
+  return <Icon className="size-6" />
+}
 
-const roadmapCategories = [
-  {
-    id: "1",
-    title: "Frontend",
-    slug: "frontend",
-    description: "HTML, CSS, JavaScript, React ve modern frontend ekosistemi",
-    icon: Code,
-    topicCount: 24,
-  },
-  {
-    id: "2",
-    title: "Backend",
-    slug: "backend",
-    description: "Node.js, API tasarımı, veritabanları ve sunucu mimarisi",
-    icon: Server,
-    topicCount: 18,
-  },
-  {
-    id: "3",
-    title: "DevOps",
-    slug: "devops",
-    description: "Docker, CI/CD, bulut servisleri ve deployment stratejileri",
-    icon: Cloud,
-    topicCount: 12,
-  },
-  {
-    id: "4",
-    title: "Mobil Geliştirme",
-    slug: "mobil-gelistirme",
-    description: "React Native, Flutter ve cross-platform uygulama geliştirme",
-    icon: Smartphone,
-    topicCount: 15,
-  },
-]
+export default async function HomePage() {
+  // Gerçek verileri veritabanından çekiyoruz
+  const [latestPosts, categories, latestVideos] = await Promise.all([
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    }),
+    prisma.category.findMany({
+      orderBy: { order: "asc" },
+      include: {
+        _count: {
+          select: { roadmaps: true }
+        }
+      }
+    }),
+    prisma.video.findMany({
+      where: { published: true },
+      orderBy: { order: "asc" }, // İstenirse createdAt: "desc" de yapılabilir
+      take: 2, // Ana sayfada çok yer kaplamaması için son 2 veya 3 video
+    })
+  ])
 
-/* ================================================================
-   ANA SAYFA
-   ================================================================ */
-
-export default function HomePage() {
   return (
     <>
       {/* ───── HERO ───── */}
       <section className="relative overflow-hidden">
-        {/* Subtle background gradient */}
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
         </div>
@@ -112,6 +83,54 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ───── YOUTUBE VİDEOLARI (YENİ ALAN) ───── */}
+      {latestVideos.length > 0 && (
+        <section className="border-t border-border/40">
+          <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-24">
+            <div className="mb-12 flex items-end justify-between">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl flex items-center gap-2">
+                  <PlayCircle className="text-red-500 size-8" />
+                  YouTube Videolarım
+                </h2>
+                <p className="mt-2 text-muted-foreground">
+                  Yazılım, kariyer ve teknoloji üzerine son videolarım
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {latestVideos.map((video) => {
+                const embedUrl = getYouTubeEmbedUrl(video.youtubeUrl)
+                return (
+                  <div key={video.id} className="flex flex-col gap-3">
+                    {embedUrl ? (
+                      <div className="overflow-hidden rounded-2xl border border-border shadow-sm aspect-video">
+                        <iframe
+                          src={embedUrl}
+                          title={video.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="h-full w-full border-0"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex aspect-video items-center justify-center rounded-2xl bg-muted border border-border">
+                        Geçersiz Video Linki
+                      </div>
+                    )}
+                    <h3 className="font-semibold text-lg line-clamp-2">{video.title}</h3>
+                    {video.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">{video.description}</p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ───── SON YAZILAR ───── */}
       <section className="border-t border-border/40 bg-muted/30">
         <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-24">
@@ -133,32 +152,38 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {latestPosts.map((post) => (
-              <Link key={post.id} href={`/blog/${post.slug}`} className="group">
-                <Card className="h-full transition-colors hover:border-primary/20 hover:bg-card/80">
-                  <CardHeader>
-                    <p className="text-xs font-medium text-muted-foreground">
-                      {post.publishedAt}
-                    </p>
-                    <CardTitle className="mt-1.5 text-lg leading-snug group-hover:text-primary transition-colors">
-                      {post.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-                      {post.excerpt}
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <span className="text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                      Devamını Oku →
-                    </span>
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          {latestPosts.length === 0 ? (
+            <div className="text-center text-muted-foreground py-10">
+              Henüz blog yazısı yayınlanmamış.
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {latestPosts.map((post) => (
+                <Link key={post.id} href={`/blog/${post.slug}`} className="group">
+                  <Card className="h-full transition-colors hover:border-primary/20 hover:bg-card/80">
+                    <CardHeader>
+                      <p className="text-xs font-medium text-muted-foreground">
+                        {new Date(post.createdAt).toLocaleDateString("tr-TR")}
+                      </p>
+                      <CardTitle className="mt-1.5 text-lg leading-snug group-hover:text-primary transition-colors">
+                        {post.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                        {post.excerpt}
+                      </p>
+                    </CardContent>
+                    <CardFooter>
+                      <span className="text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                        Devamını Oku →
+                      </span>
+                    </CardFooter>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
 
           <Link
             href="/blog"
@@ -183,33 +208,38 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {roadmapCategories.map((category) => {
-              const Icon = category.icon
-              return (
-                <Link
-                  key={category.id}
-                  href={`/roadmap/${category.slug}`}
-                  className="group"
-                >
-                  <Card className="h-full text-center transition-all hover:border-primary/20 hover:shadow-md hover:-translate-y-0.5">
-                    <CardContent className="pt-8 pb-6">
-                      <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                        <Icon className="size-6" />
-                      </div>
-                      <h3 className="font-semibold">{category.title}</h3>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                        {category.description}
-                      </p>
-                      <p className="mt-3 text-xs font-medium text-primary">
-                        {category.topicCount} konu
-                      </p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              )
-            })}
-          </div>
+          {categories.length === 0 ? (
+            <div className="text-center text-muted-foreground py-10">
+              Henüz yol haritası kategorisi eklenmemiş.
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {categories.map((category) => {
+                return (
+                  <Link
+                    key={category.id}
+                    href={`/roadmap/${category.slug}`}
+                    className="group"
+                  >
+                    <Card className="h-full text-center transition-all hover:border-primary/20 hover:shadow-md hover:-translate-y-0.5">
+                      <CardContent className="pt-8 pb-6">
+                        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                          <CategoryIcon iconName={category.icon} />
+                        </div>
+                        <h3 className="font-semibold">{category.title}</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                          {category.description}
+                        </p>
+                        <p className="mt-3 text-xs font-medium text-primary">
+                          {category._count.roadmaps} yol haritası
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
     </>
