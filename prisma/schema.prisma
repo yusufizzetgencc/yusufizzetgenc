@@ -1,0 +1,95 @@
+// Prisma Schema — Yusuf İzzet Genç Kişisel Site
+// CLAUDE.md'deki veri modeline birebir uygun
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+// ─── AUTH ────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  passwordHash String?
+  image        String?
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+  posts        Post[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// ─── BLOG ────────────────────────────────────────
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String?
+  content     String    // Tiptap JSON veya HTML olarak saklanacak
+  coverImage  String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ─── ROADMAP ─────────────────────────────────────
+
+model Category {
+  id          String    @id @default(cuid())
+  title       String    // örn. "Frontend"
+  slug        String    @unique
+  description String?
+  icon        String?   // ikon adı (lucide-react)
+  order       Int       @default(0)
+  roadmaps    Roadmap[]
+}
+
+model Roadmap {
+  id          String   @id @default(cuid())
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  title       String   // örn. "Frontend Yol Haritası"
+  slug        String   @unique
+  description String?
+  order       Int      @default(0)
+  topics      Topic[]
+}
+
+model Topic {
+  id        String  @id @default(cuid())
+  roadmapId String
+  roadmap   Roadmap @relation(fields: [roadmapId], references: [id])
+  title     String  // örn. "İnternet Nasıl Çalışır?"
+  slug      String
+  content   String  // Tiptap JSON veya HTML
+  videoUrl  String? // YouTube linki
+  order     Int     @default(0)
+
+  @@unique([roadmapId, slug])
+}
+
+// ─── PROJELER ────────────────────────────────────
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  content     String?
+  coverImage  String?
+  liveUrl     String?
+  githubUrl   String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
