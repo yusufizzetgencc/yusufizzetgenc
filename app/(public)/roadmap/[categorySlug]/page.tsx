@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import { ChevronRight, ArrowLeft } from "lucide-react"
+import { ArrowLeft, Layers } from "lucide-react"
+import { CategoryFlow } from "../components/category-flow"
 
 export default async function CategoryPage({
   params,
@@ -17,7 +18,7 @@ export default async function CategoryPage({
         orderBy: { order: "asc" },
         include: {
           topics: {
-            select: { id: true }
+            orderBy: { order: "asc" }
           }
         }
       }
@@ -29,62 +30,40 @@ export default async function CategoryPage({
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-16 md:py-24 page-enter">
+    <div className="relative mx-auto max-w-7xl px-4 py-16 md:py-24 page-enter">
+      {/* Arka plan süslemeleri */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-[10%] -left-[10%] h-[400px] w-[400px] rounded-full bg-indigo-500/10 blur-[100px]" />
+        <div className="absolute top-[40%] right-[0%] h-[300px] w-[300px] rounded-full bg-purple-500/10 blur-[100px]" />
+      </div>
+
       {/* Geri Butonu */}
       <Link 
         href="/roadmap"
-        className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        className="group mb-12 inline-flex items-center gap-2 rounded-full border border-border/50 bg-card/50 px-4 py-2 text-sm font-medium text-muted-foreground backdrop-blur-sm transition-all hover:bg-card hover:text-foreground hover:shadow-sm"
       >
-        <ArrowLeft className="size-4" />
-        Tüm Kategoriler
+        <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
+        Tüm Kategorilere Dön
       </Link>
       
-      {/* Sayfa Başlığı */}
-      <div className="mb-14 max-w-2xl space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+      {/* Sayfa Başlığı (Hero) */}
+      <div className="mb-20 mx-auto max-w-4xl text-center flex flex-col items-center">
+        <div className="mb-6 inline-flex items-center rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1 text-sm font-medium text-purple-500 backdrop-blur-sm">
+          <Layers className="mr-2 size-4" />
+          Kategori Detayı
+        </div>
+        <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl text-foreground">
           {category.title}
         </h1>
         {category.description && (
-          <p className="text-lg text-muted-foreground">
+          <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
             {category.description}
           </p>
         )}
       </div>
 
-      {/* Roadmap Listesi */}
-      {category.roadmaps.length === 0 ? (
-        <div className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
-          Bu kategoriye ait henüz bir yol haritası eklenmemiş.
-        </div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {category.roadmaps.map((roadmap) => (
-            <Link
-              key={roadmap.id}
-              href={`/roadmap/${category.slug}/${roadmap.slug}`}
-              className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all hover:border-indigo/40 hover:shadow-[0_4px_24px_-6px_rgba(99,102,241,0.12)]"
-            >
-              <div>
-                <h3 className="text-xl font-semibold tracking-tight group-hover:text-primary transition-colors">{roadmap.title}</h3>
-                {roadmap.description && (
-                  <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
-                    {roadmap.description}
-                  </p>
-                )}
-              </div>
-              <div className="mt-6 flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <span className="inline-block size-1.5 rounded-full bg-primary/40" />
-                  {roadmap.topics.length} Konu
-                </span>
-                <span className="flex items-center text-sm font-medium text-indigo opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1">
-                  İncele <ChevronRight className="ml-1 size-4" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+      {/* Dev Ağaç Yapısı (Flowchart) */}
+      <CategoryFlow roadmaps={category.roadmaps} />
     </div>
   )
 }

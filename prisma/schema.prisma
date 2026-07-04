@@ -73,9 +73,10 @@ model Topic {
   roadmap   Roadmap @relation(fields: [roadmapId], references: [id])
   title     String  // örn. "İnternet Nasıl Çalışır?"
   slug      String
-  content   String  // Tiptap JSON veya HTML
-  videoUrl  String? // YouTube linki
-  order     Int     @default(0)
+  content     String  // Tiptap JSON veya HTML
+  videoUrl    String? // YouTube linki
+  externalUrl String? // Harici link (örn. dokümantasyon, proje)
+  order       Int     @default(0)
 
   @@unique([roadmapId, slug])
 }

@@ -64,6 +64,43 @@ export async function createCategory(prevState: CategoryFormState, formData: For
   return { success: true, message: "Kategori oluşturuldu." }
 }
 
+export async function updateCategory(id: string, prevState: CategoryFormState, formData: FormData): Promise<CategoryFormState> {
+  const session = await auth()
+  if (session?.user?.role !== "ADMIN") {
+    return { errors: { _form: ["Yetkisiz işlem"] } }
+  }
+
+  const validatedFields = categorySchema.safeParse({
+    title: formData.get("title"),
+    slug: formData.get("slug"),
+    description: formData.get("description"),
+    icon: formData.get("icon"),
+    order: formData.get("order"),
+  })
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Lütfen eksik alanları doldurun.",
+    }
+  }
+
+  try {
+    await prisma.category.update({
+      where: { id },
+      data: validatedFields.data,
+    })
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      return { errors: { slug: ["Bu slug zaten kullanılıyor."] } }
+    }
+    return { errors: { _form: ["Kayıt sırasında bir hata oluştu."] } }
+  }
+
+  revalidatePath("/admin/roadmap")
+  return { success: true, message: "Kategori güncellendi." }
+}
+
 export async function deleteCategory(id: string) {
   const session = await auth()
   if (session?.user?.role !== "ADMIN") {
@@ -171,6 +208,7 @@ const topicSchema = z.object({
   slug: z.string().min(1, "Slug gerekli"),
   content: z.string().min(1, "İçerik gerekli"),
   videoUrl: z.string().optional(),
+  externalUrl: z.string().optional(),
   roadmapId: z.string().min(1, "Yol haritası (Roadmap) gerekli"),
   order: z.coerce.number().default(0),
 })
@@ -181,6 +219,7 @@ export type TopicFormState = {
     slug?: string[]
     content?: string[]
     videoUrl?: string[]
+    externalUrl?: string[]
     roadmapId?: string[]
     order?: string[]
     _form?: string[]
@@ -203,6 +242,7 @@ export async function createTopic(prevState: TopicFormState, formData: FormData)
     slug: formData.get("slug"),
     content: formData.get("content"),
     videoUrl: formData.get("videoUrl"),
+    externalUrl: formData.get("externalUrl"),
     roadmapId,
     order: formData.get("order"),
   })
@@ -241,6 +281,7 @@ export async function updateTopic(id: string, prevState: TopicFormState, formDat
     slug: formData.get("slug"),
     content: formData.get("content"),
     videoUrl: formData.get("videoUrl"),
+    externalUrl: formData.get("externalUrl"),
     roadmapId,
     order: formData.get("order"),
   })

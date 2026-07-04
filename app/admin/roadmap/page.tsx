@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table"
 import { deleteCategory, deleteRoadmap } from "./actions"
 import { CategoryDialog } from "./components/category-dialog"
+import { EditCategoryDialog } from "./components/edit-category-dialog"
 import { RoadmapDialog } from "./components/roadmap-dialog"
 
 export default async function AdminRoadmapPage() {
@@ -84,22 +85,25 @@ export default async function AdminRoadmapPage() {
                     )}
                   </div>
                 </div>
-                <form
-                  action={async () => {
-                    "use server"
-                    await deleteCategory(category.id)
-                  }}
-                >
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    type="submit"
-                    title="Kategoriyi Sil"
+                <div className="flex items-center gap-1">
+                  <EditCategoryDialog category={category} />
+                  <form
+                    action={async () => {
+                      "use server"
+                      await deleteCategory(category.id)
+                    }}
                   >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </form>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      type="submit"
+                      title="Kategoriyi Sil"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </form>
+                </div>
               </div>
 
               {/* Roadmap Tablosu */}

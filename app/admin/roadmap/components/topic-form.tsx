@@ -28,6 +28,7 @@ interface TopicFormProps {
     slug: string
     content: string
     videoUrl: string | null
+    externalUrl: string | null
     order: number
   } | null
 }
@@ -110,6 +111,16 @@ export function TopicForm({ roadmapId, topic }: TopicFormProps) {
             name="videoUrl"
             defaultValue={topic?.videoUrl || ""}
             placeholder="https://www.youtube.com/watch?v=..."
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="externalUrl">Harici Link / Doküman (Opsiyonel)</Label>
+          <Input
+            id="externalUrl"
+            name="externalUrl"
+            defaultValue={topic?.externalUrl || ""}
+            placeholder="https://example.com/docs"
           />
         </div>
         

@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import { ArrowLeft, PlayCircle, ChevronRight } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
+import { RoadmapFlow } from "../../components/roadmap-flow"
 
 export default async function RoadmapDetailPage({
   params,
@@ -53,53 +54,8 @@ export default async function RoadmapDetailPage({
         )}
       </div>
 
-      {/* Timeline */}
-      <div className="relative">
-        {/* Sol taraftaki dikey çizgi */}
-        <div className="absolute left-[27px] top-6 bottom-6 w-px bg-gradient-to-b from-border via-border/60 to-transparent hidden sm:block" />
-
-        <div className="space-y-4 relative">
-          {roadmap.topics.length === 0 ? (
-            <div className="flex min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
-              Bu yol haritası için henüz konu eklenmemiş.
-            </div>
-          ) : (
-            roadmap.topics.map((topic, index) => (
-              <div key={topic.id} className="relative flex items-start group">
-                
-                {/* Numara Dairesi */}
-                <div className="z-10 hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-border bg-card text-lg font-bold text-muted-foreground group-hover:border-primary group-hover:text-primary group-hover:shadow-[0_0_0_4px_rgba(99,102,241,0.08)] transition-all mt-0.5">
-                  {index + 1}
-                </div>
-
-                {/* İçerik Kartı */}
-                <div className="sm:ml-6 flex-1">
-                  <Link 
-                    href={`/roadmap/${categorySlug}/${roadmapSlug}/${topic.slug}`}
-                    className="flex items-center justify-between rounded-xl border border-border bg-card p-5 transition-all hover:border-indigo/40 hover:shadow-[0_4px_24px_-6px_rgba(99,102,241,0.12)] hover:bg-card/80"
-                  >
-                    <div>
-                      <div className="text-xs font-medium text-primary/70 mb-1.5 sm:hidden">
-                        Adım {index + 1}
-                      </div>
-                      <h3 className="text-lg font-semibold tracking-tight group-hover:text-primary transition-colors">
-                        {topic.title}
-                      </h3>
-                      {topic.videoUrl && (
-                        <span className="mt-1.5 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                          <PlayCircle className="size-3" /> Video mevcut
-                        </span>
-                      )}
-                    </div>
-                    <ChevronRight className="size-5 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 ml-4" />
-                  </Link>
-                </div>
-
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+      {/* RoadmapFlow Component */}
+      <RoadmapFlow topics={roadmap.topics} />
     </div>
   )
 }
