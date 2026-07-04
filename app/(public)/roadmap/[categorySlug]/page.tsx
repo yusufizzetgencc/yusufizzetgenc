@@ -63,7 +63,7 @@ export default async function CategoryPage({
       </div>
 
       {/* Dev Ağaç Yapısı (Flowchart) */}
-      <CategoryFlow roadmaps={category.roadmaps} />
+      <CategoryFlow roadmaps={category.roadmaps} categorySlug={category.slug} />
     </div>
   )
 }
